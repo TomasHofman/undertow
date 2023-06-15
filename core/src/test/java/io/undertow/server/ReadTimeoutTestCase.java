@@ -193,9 +193,13 @@ public class ReadTimeoutTestCase {
                 Assert.assertEquals(FORM_PARAM_LENGTH, test.getValue().length());
             }
 
+            // Announce content length to make sure the connection gets closed after data are sent.
+            final int contentLength = 5;
+            exchange.getResponseHeaders().add(Headers.CONTENT_LENGTH, contentLength);
+
             // Write some response with delays, to breach read-timeout if it hasn't been cleaned-up.
             Sender responseSender = exchange.getResponseSender();
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < contentLength; i++) {
                 Thread.sleep(200);
                 responseSender.send("*", new IoCallback() {
                     @Override
